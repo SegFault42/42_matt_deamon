@@ -10,6 +10,12 @@ static bool	check_root(void)
 	return (true);
 }
 
+static void	prompt(int sig)
+{
+	if (sig == SIGINT)
+		quit();
+}
+
 int	main(void)
 {
 	if (check_root() == false)

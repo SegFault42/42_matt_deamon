@@ -42,6 +42,12 @@ int	setup_deamon(void)
 	return (sock);
 }
 
+static void	prompt(int sig)
+{
+	if (sig == SIGTERM)
+		quit();
+}
+
 void	create_deamon()
 {
 	pid_t	ps_deamon = 0;
@@ -57,47 +63,59 @@ void	create_deamon()
 		std::cout << "fork ok" << std::endl << "pid = " << ps_deamon << std::endl;
 		exit(0);
 	}
+	signal(SIGTERM, prompt);
 }
 
 int	deamon_exist()
 {
 	struct stat	st;
-	int			fd = 0;
 
-	if (stat("/var/lock/matt_daemon.lock", &st) == -1)
+	if (stat("/var/lock/matt_daemon.lock", &st) == -1 && errno == 2)
+		return (false);
+	else
 	{
-		if (errno == 2)
-		{
-			fd = open("/var/lock/matt_daemon.lock", O_CREAT);
-			if (fd == -1)
-			{
-				perror("open()");
-				exit(errno);
-			}
-			close(fd);
-			return (false);
-		}
-		else
-		{
-			perror("stat()");
-			exit(errno);
-		}
+		perror("stat()");
+		exit(errno);
 	}
 	return (true);
 }
 
+static void	create_lock_file()
+{
+	int	fd = 0;
+
+	fd = open("/var/lock/matt_daemon.lock", O_CREAT);
+	if (fd == -1)
+	{
+		perror("open()");
+		exit(errno);
+	}
+	close(fd);
+}
+
+void	quit(void)
+{
+	if (remove("/var/lock/matt_daemon.lock") == -1)
+		perror("remove()");
+	//close(socket);
+	//close(sock);
+	exit(0);
+}
 
 void	daemon(void)
 {
-	int	socket = 0;
-	int	child_pid;
-	int	sock;
+	int					socket = 0;
+	int					child_pid;
+	int					sock;
 	uint32_t			client_socket_len;
+	char				buff[4096] = {0};
+	int					fd = 0;
 	struct sockaddr_in	sin;
-	char	buff[4096] = {0};
-	int	fd = 0;
+	ssize_t				ret_recv;
 
 	socket = setup_deamon();
+	std::cout << "socket = " << socket << std::endl;
+	create_lock_file();
 
 	fd = open("/tmp/matt_daemon.log", O_RDWR | O_CREAT | O_APPEND, 0755);
 	if (fd == -1)
@@ -108,8 +126,11 @@ void	daemon(void)
 	sock = accept(socket, (struct sockaddr *)&sin, &client_socket_len);
 	while (1)
 	{
-		while (recv(sock, buff, sizeof(buff), 0) > 0)
-			dprintf(fd, "%s", buff);
+		ret_recv = recv(sock, buff, sizeof(buff), 0);
+		std::cout << "ret_recv = " << ret_recv << std::endl;
+		if (!strcmp(buff, "quit\n") || !ret_recv)
+			quit();
+		dprintf(fd, "%s", buff);
 		memset(buff, 0, sizeof(buff));
 	}
 }

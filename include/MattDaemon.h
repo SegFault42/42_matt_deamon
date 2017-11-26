@@ -14,10 +14,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <signal.h>
 
 void	daemon(void);
 int		deamon_exist();
 void	create_deamon();
-int	setup_deamon(void);
+int		setup_deamon(void);
+void	quit(void);
 
 #endif

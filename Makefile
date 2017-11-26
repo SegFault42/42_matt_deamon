@@ -1,7 +1,7 @@
 ##################################_COMPILATION_#################################
 NAME	= Matt_deamon
 CC		= clang++
-FLAG	= -Weverything
+FLAG	= 
 SRCS	=	./source/main.cpp\
 			./source/deamon.cpp
 
