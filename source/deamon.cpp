@@ -32,12 +32,12 @@ int	setup_deamon(void)
 	if ((bind(sock, (const struct sockaddr *)&sin, sizeof(sin))) == -1)
 	{
 		perror("bind");
-		exit(errno);
+		return (-1);
 	}
 	if ((listen(sock, 2)) == -1)
 	{
 		perror("listen");
-		exit(errno);
+		return (-1);
 	}
 	return (sock);
 }
@@ -69,29 +69,31 @@ void	create_deamon()
 int	deamon_exist()
 {
 	struct stat	st;
+	int			ret_stat = 0;
 
-	if (stat("/var/lock/matt_daemon.lock", &st) == -1 && errno == 2)
+	ret_stat = stat("/var/lock/matt_daemon.lock", &st);
+	if (ret_stat == -1)
 		return (false);
-	else
-	{
-		perror("stat()");
-		exit(errno);
-	}
 	return (true);
 }
 
-static void	create_lock_file()
-{
-	int	fd = 0;
+//static void	create_lock_file()
+//{
+	//int	fd = 0;
 
-	fd = open("/var/lock/matt_daemon.lock", O_CREAT);
-	if (fd == -1)
-	{
-		perror("open()");
-		exit(errno);
-	}
-	close(fd);
-}
+	//fd = open("/var/lock/matt_daemon.lock", O_CREAT | O_RDWR, 0755);
+	//if (fd == -1)
+	//{
+		//perror("open()");
+		//exit(errno);
+	//}
+	//if (flock(fd, LOCK_EX) == -1)
+	//{
+		//perror("flock");
+		//exit(errno);
+	//}
+	////close(fd);
+//}
 
 void	quit(void)
 {
@@ -102,7 +104,25 @@ void	quit(void)
 	exit(0);
 }
 
-void	daemon(void)
+int	create_log_file(void)
+{
+	int	fd;
+
+	if (mkdir("/var/log/matt_daemon", 0755) == -1 && errno != 17)
+	{
+		perror("mkdir");
+		exit (errno);
+	}
+	fd = open("/var/log/matt_daemon/matt_daemon.log", O_RDWR | O_CREAT | O_APPEND, 0755);
+	if (fd == -1)
+	{
+		perror("open");
+		exit (errno);
+	}
+	return (fd);
+}
+
+void	daemon(Tintin_reporter *tintin)
 {
 	int					socket = 0;
 	int					child_pid;
@@ -115,22 +135,19 @@ void	daemon(void)
 
 	socket = setup_deamon();
 	std::cout << "socket = " << socket << std::endl;
-	create_lock_file();
+	if (socket == -1)
+		return ;
+	//create_lock_file();
 
-	fd = open("/tmp/matt_daemon.log", O_RDWR | O_CREAT | O_APPEND, 0755);
-	if (fd == -1)
-	{
-		perror("open");
-		exit (errno);
-	}
+	fd = create_log_file();
 	sock = accept(socket, (struct sockaddr *)&sin, &client_socket_len);
 	while (1)
 	{
 		ret_recv = recv(sock, buff, sizeof(buff), 0);
-		std::cout << "ret_recv = " << ret_recv << std::endl;
-		if (!strcmp(buff, "quit\n") || !ret_recv)
-			quit();
-		dprintf(fd, "%s", buff);
+		buff[ret_recv -1] = '\0';
+		if (!strcmp(buff, "quit") || !ret_recv)
+			return ;
+		tintin->write_log(buff);
 		memset(buff, 0, sizeof(buff));
 	}
 }

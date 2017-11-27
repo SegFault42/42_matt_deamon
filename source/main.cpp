@@ -20,13 +20,16 @@ int	main(void)
 {
 	if (check_root() == false)
 		return (false);
-
 	if (deamon_exist() == true)
 	{
 		std::cerr << "Another instance of MattDaemon is already running" << std::endl;
 		return (0);
 	}
 
+	Tintin_reporter	tintin; // create object
+
+
+
 	create_deamon();
-	daemon();
+	daemon(&tintin);
 }

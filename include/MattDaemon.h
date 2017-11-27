@@ -2,6 +2,8 @@
 #define MATTDAEMON_H
 
 #include <iostream>
+#include <string>
+#include <ctime>
 
 # include <netdb.h>
 # include <netinet/in.h>
@@ -15,8 +17,23 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/file.h>
 
-void	daemon(void);
+class	Tintin_reporter
+{
+	public:
+
+	Tintin_reporter();
+	void	write_log(std::string log) const;
+	void	create_lock_file(void) const;
+	void	delete_lock_file(void) const;
+	~Tintin_reporter();
+
+	private:
+
+};
+
+void	daemon(Tintin_reporter *tintin);
 int		deamon_exist();
 void	create_deamon();
 int		setup_deamon(void);

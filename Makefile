@@ -3,7 +3,8 @@ NAME	= Matt_deamon
 CC		= clang++
 FLAG	= 
 SRCS	=	./source/main.cpp\
-			./source/deamon.cpp
+			./source/deamon.cpp\
+			./source/Tintin_reporter.cpp
 
 OBJS	= $(SRCS:.c=.o)
 
