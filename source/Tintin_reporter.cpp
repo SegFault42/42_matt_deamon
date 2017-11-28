@@ -18,7 +18,7 @@ void	Tintin_reporter::write_log(std::string log) const
 	}
 
 	dprintf(fd,
-			"[%d/%d/%d-%d:%d:%d] [ INFO ] - %s.\n",
+			"[%d/%d/%d-%d:%d:%d] [ INFO ] - %s\n",
 			now->tm_mday,
 			now->tm_mon + 1,
 			now->tm_year + 1900,
@@ -42,7 +42,7 @@ void	Tintin_reporter::create_lock_file(void) const
 	}
 	flock(fd, LOCK_EX);
 	close(fd);
-	write_log("Matt_daemon: Started");
+	write_log("\033[32mMatt_daemon: Started.\033[0m");
 }
 
 void	Tintin_reporter::delete_lock_file(void) const
@@ -58,7 +58,7 @@ void	Tintin_reporter::delete_lock_file(void) const
 	remove("/var/lock/matt_daemon.lock");
 	flock(fd, LOCK_UN);
 	close(fd);
-	write_log("Matt_daemon: Quitting");
+	write_log("Matt_daemon: Quitting.");
 }
 
 //Constructeur

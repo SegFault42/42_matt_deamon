@@ -18,7 +18,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(FLAG) $(INCLUDE) -o $(NAME) $(OBJS)
-	@printf "✅  Compilation done. (serveur)\n"
+	@printf "✅  Compilation done.\n"
 
 clean:
 	@printf "                                                               \r"

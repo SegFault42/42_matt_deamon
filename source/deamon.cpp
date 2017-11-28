@@ -1,5 +1,7 @@
 #include "MattDaemon.h"
 
+
+
 int	setup_deamon(void)
 {
 	int					sock;
@@ -42,10 +44,32 @@ int	setup_deamon(void)
 	return (sock);
 }
 
-static void	prompt(int sig)
+static void	signal_handler(int sig)
 {
-	if (sig == SIGTERM)
-		quit();
+	int			fd = 0;
+	time_t		t = time(0);
+	struct tm	*now = localtime(&t);
+
+	fd = open("/var/log/matt_daemon/matt_daemon.log", O_RDWR | O_APPEND);
+	dprintf(fd,
+			"[%d/%d/%d-%d:%d:%d] [ SIGNAL ] - Signal handler\n",
+			now->tm_mday,
+			now->tm_mon + 1,
+			now->tm_year + 1900,
+			now->tm_hour,
+			now->tm_min,
+			now->tm_sec);
+	dprintf(fd,
+			"[%d/%d/%d-%d:%d:%d] [ INFO ] - Matt_daemon: Quitting.\n",
+			now->tm_mday,
+			now->tm_mon + 1,
+			now->tm_year + 1900,
+			now->tm_hour,
+			now->tm_min,
+			now->tm_sec);
+	close(fd);
+	remove("/var/lock/matt_daemon.lock");
+	exit(0);
 }
 
 void	create_deamon()
@@ -63,40 +87,22 @@ void	create_deamon()
 		std::cout << "fork ok" << std::endl << "pid = " << ps_deamon << std::endl;
 		exit(0);
 	}
-	signal(SIGTERM, prompt);
+	signal(SIGTERM, signal_handler);
 }
-
-int	deamon_exist()
-{
-	struct stat	st;
-	int			ret_stat = 0;
-
-	ret_stat = stat("/var/lock/matt_daemon.lock", &st);
-	if (ret_stat == -1)
-		return (false);
-	return (true);
-}
-
-//static void	create_lock_file()
-//{
-	//int	fd = 0;
-
-	//fd = open("/var/lock/matt_daemon.lock", O_CREAT | O_RDWR, 0755);
-	//if (fd == -1)
-	//{
-		//perror("open()");
-		//exit(errno);
-	//}
-	//if (flock(fd, LOCK_EX) == -1)
-	//{
-		//perror("flock");
-		//exit(errno);
-	//}
-	////close(fd);
-//}
 
 void	quit(void)
 {
+	int	fd;
+
+	fd = open("/var/log/matt_daemon/matt_daemon.log", O_RDWR | O_APPEND);
+	if (fd != -1)
+	{
+		dprintf(fd, "\033[31mMatt_daemon: Quitting.\033[0m");
+		close(fd);
+	}
+	else
+		perror("open()");
+
 	if (remove("/var/lock/matt_daemon.lock") == -1)
 		perror("remove()");
 	//close(socket);
@@ -133,6 +139,7 @@ void	daemon(Tintin_reporter *tintin)
 	struct sockaddr_in	sin;
 	ssize_t				ret_recv;
 
+	create_deamon();
 	socket = setup_deamon();
 	std::cout << "socket = " << socket << std::endl;
 	if (socket == -1)

@@ -1,5 +1,6 @@
 #include "MattDaemon.h"
 
+
 static bool	check_root(void)
 {
 	if (getuid() != 0)
@@ -10,11 +11,17 @@ static bool	check_root(void)
 	return (true);
 }
 
-static void	prompt(int sig)
+static int	deamon_exist()
 {
-	if (sig == SIGINT)
-		quit();
+	struct stat	st;
+	int			ret_stat = 0;
+
+	ret_stat = stat("/var/lock/matt_daemon.lock", &st);
+	if (ret_stat == -1)
+		return (false);
+	return (true);
 }
+
 
 int	main(void)
 {
@@ -28,8 +35,5 @@ int	main(void)
 
 	Tintin_reporter	tintin; // create object
 
-
-
-	create_deamon();
 	daemon(&tintin);
 }

@@ -34,7 +34,6 @@ class	Tintin_reporter
 };
 
 void	daemon(Tintin_reporter *tintin);
-int		deamon_exist();
 void	create_deamon();
 int		setup_deamon(void);
 void	quit(void);
