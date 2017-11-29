@@ -1,69 +1,70 @@
 #include "MattDaemon.h"
 
 //Methode
-void	Tintin_reporter::write_log(std::string log) const
+void	Tintin_reporter::write_log(std::string log, std::string type) const
 {
-	int			fd = 0;
 	time_t		t = time(0);
 	struct tm	*now = localtime(&t);
 
-	fd = open("/var/log/matt_daemon/matt_daemon.log",
-				O_RDWR | O_CREAT | O_APPEND,
-				0755);
-
-	if (fd == -1)
-	{
-		perror("write_log failure");
-		exit(errno);
-	}
-
-	dprintf(fd,
-			"[%d/%d/%d-%d:%d:%d] [ INFO ] - %s\n",
+	dprintf(m_fd_log,
+			"[%d/%d/%d-%d:%d:%02d] [ %s ] - %s\n",
 			now->tm_mday,
 			now->tm_mon + 1,
 			now->tm_year + 1900,
 			now->tm_hour,
 			now->tm_min,
 			now->tm_sec,
+			type.c_str(),
 			log.c_str());
 
-	close(fd);
+	//close(fd);
+}
+void	Tintin_reporter::create_log_file(void)
+{
+	if (mkdir("/var/log/matt_daemon", 0755) == -1 && errno != 17)
+	{
+		perror("mkdir");
+		exit (errno);
+	}
+	m_fd_log = open("/var/log/matt_daemon/matt_daemon.log", O_RDWR | O_CREAT | O_APPEND, 0755);
+	if (m_fd_log == -1)
+	{
+		perror("open");
+		exit (errno);
+	}
 }
 
-void	Tintin_reporter::create_lock_file(void) const
+void	Tintin_reporter::create_lock_file(void)
 {
-	int	fd;
+	int	ret_flock = 0;
 
-	fd = open("/var/lock/matt_daemon.lock", O_CREAT, 0755);
-	if (fd == -1)
+	m_fd_lock = open("/var/lock/matt_daemon.lock", O_CREAT, 0755);
+	if (m_fd_lock == -1)
 	{
-		perror("lockfile failure");
 		exit(errno);
 	}
-	flock(fd, LOCK_EX);
-	close(fd);
-	write_log("\033[32mMatt_daemon: Started.\033[0m");
+	ret_flock = flock(m_fd_lock, LOCK_EX | LOCK_NB);
+	if (ret_flock == -1)
+	{
+		std::cout << "Another instance of Matt_daemon running." << std::endl;
+		write_log("Matt_daemon: Error file locked", "\033[1;31mERROR\033[0m");
+		write_log("Matt_daemon: Quitting.", "\033[1;32mINFO\033[0m");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void	Tintin_reporter::delete_lock_file(void) const
 {
-	int	fd;
-
-	fd = open("/var/lock/matt_daemon.lock", O_RDONLY);
-	if (fd == -1)
-	{
-		perror("delete_lock_file failure");
-		exit(errno);
-	}
+	flock(m_fd_lock, LOCK_UN);
+	close(m_fd_lock);
 	remove("/var/lock/matt_daemon.lock");
-	flock(fd, LOCK_UN);
-	close(fd);
-	write_log("Matt_daemon: Quitting.");
 }
 
 //Constructeur
 Tintin_reporter::Tintin_reporter()
 {
+	create_log_file();
+	write_log("Matt_daemon: Started.", "\033[1;32mINFO\033[0m");
 	create_lock_file();
 }
 
@@ -71,4 +72,6 @@ Tintin_reporter::Tintin_reporter()
 Tintin_reporter::~Tintin_reporter()
 {
 	delete_lock_file();
+	write_log("Matt_daemon: Quitting.", "\033[1;32mINFO\033[0m");
+	close(m_fd_log);
 }

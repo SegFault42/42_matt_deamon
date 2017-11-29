@@ -1,5 +1,5 @@
 ##################################_COMPILATION_#################################
-NAME	= Matt_deamon
+NAME	= Matt_daemon
 CC		= clang++
 FLAG	= 
 SRCS	=	./source/main.cpp\
