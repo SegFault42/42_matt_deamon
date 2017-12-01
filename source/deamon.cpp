@@ -169,8 +169,8 @@ void	daemon(Tintin_reporter *tintin, char arg)
 					}
 					else
 					{
-						if (arg == 1)
-							strcpy(ft_decrypt(buffer), buffer);
+						if (!strncmp(buffer, "0xrabougue", 10))
+							strcpy(buffer, ft_decrypt(&buffer[10]));
 						tintin->write_log(buffer, "\033[1;35mLOG\033[0m");
 					}
 				}
