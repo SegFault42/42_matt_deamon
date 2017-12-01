@@ -1,5 +1,7 @@
 #include "MattDaemon.h"
 
+Tintin_reporter	*ptr;
+
 static bool	check_root(void)
 {
 	if (getuid() != 0)
@@ -16,6 +18,7 @@ int	main(void)
 		return (false);
 
 	Tintin_reporter	tintin; // create object
+	ptr = &tintin;
 
 	daemon(&tintin);
 }

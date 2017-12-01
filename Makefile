@@ -4,7 +4,7 @@ WHITE = \033[37m
 ##################################_COMPILATION_#################################
 NAME	= Matt_daemon
 CC		= clang++
-FLAG	= 
+FLAG	= -std=c++11
 SRCS	=	./source/main.cpp\
 			./source/deamon.cpp\
 			./source/Tintin_reporter.cpp
