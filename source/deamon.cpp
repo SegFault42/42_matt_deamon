@@ -72,17 +72,17 @@ void	create_deamon(Tintin_reporter *tintin)
 		std::cout << "fork ok" << std::endl << "pid = " << ps_deamon << std::endl;
 		exit(0);
 	}
-	tintin->write_log("Deamon created", "\033[1;32mINFO\033[0m");
+	tintin->write_log("Deamon created pid : " + std::to_string(getpid()), "\033[1;32mINFO\033[0m");
 	for (int i = 1; i <= 64; ++i)
 		signal(i, signal_handler);
 }
 
-void	daemon(Tintin_reporter *tintin)
+void	daemon(Tintin_reporter *tintin, char arg)
 {
 	int			new_socket, activity, i , valread , sd;
 	int			max_sd;
 	int			nb_user = 0;
-	char		buffer[1025];  //data buffer of 1K 
+	char		buffer[4097];  //data buffer of 1K 
 	fd_set		readfds;
 	t_connexion	connexion = {0};
 
@@ -149,10 +149,9 @@ void	daemon(Tintin_reporter *tintin)
 			sd = connexion.client_socket[i];
 			if (FD_ISSET( sd , &readfds))
 			{
-				if ((valread = read( sd , buffer, 1024)) == 0)
+				if ((valread = read( sd , buffer, 4096)) == 0)
 				{
 					getpeername(sd , (struct sockaddr*)&connexion.address , (socklen_t*)&connexion.addrlen);
-					printf("Host disconnected , ip %s , port %d \n" , inet_ntoa(connexion.address.sin_addr) , ntohs(connexion.address.sin_port));
 					tintin->write_log("User " + std::to_string(i + 1) + " request quit", "\033[1;35mLOG\033[0m");
 					close(sd);
 					connexion.client_socket[i] = 0;
@@ -169,7 +168,11 @@ void	daemon(Tintin_reporter *tintin)
 						nb_user--;
 					}
 					else
+					{
+						if (arg == 1)
+							strcpy(ft_decrypt(buffer), buffer);
 						tintin->write_log(buffer, "\033[1;35mLOG\033[0m");
+					}
 				}
 			}
 			for (int j = 0; j <= 2; j++)
@@ -177,7 +180,10 @@ void	daemon(Tintin_reporter *tintin)
 				if (connexion.client_socket[j] != 0)
 					break;
 				else if (j == 2)
+				{
+					tintin->write_log("All client disconnected.", "\033[1;32mINFO\033[0m");
 					return ;
+				}
 			}
 		}
 	}

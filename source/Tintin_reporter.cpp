@@ -72,7 +72,7 @@ void	Tintin_reporter::create_lock_file(void)
 	{
 		std::cout << "Another instance of Matt_daemon running." << std::endl;
 		write_log("Matt_daemon: Error file locked", "\033[1;31mERROR\033[0m");
-		write_log("Matt_daemon: Quitting.\n", "\033[1;32mINFO\033[0m");
+		write_log("Matt_daemon: Quitting.", "\033[1;32mINFO\033[0m");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -88,7 +88,6 @@ void	Tintin_reporter::delete_lock_file(void) const
 Tintin_reporter::Tintin_reporter()
 {
 	create_log_file();
-	write_log("Matt_daemon: Started. pid : " + std::to_string(getpid() + 1) , "\033[1;32mINFO\033[0m");
 	create_lock_file();
 }
 
@@ -96,6 +95,6 @@ Tintin_reporter::Tintin_reporter()
 Tintin_reporter::~Tintin_reporter()
 {
 	delete_lock_file();
-	write_log("Matt_daemon: Quitting.\n", "\033[1;32mINFO\033[0m");
+	write_log("Matt_daemon: Quitting.", "\033[1;32mINFO\033[0m");
 	close(m_fd_log);
 }

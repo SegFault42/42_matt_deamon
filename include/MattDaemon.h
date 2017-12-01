@@ -51,10 +51,10 @@ typedef struct			s_connexion
 	int					client_socket[3];
 }						t_connexion;
 
-void	daemon(Tintin_reporter *tintin);
+void	daemon(Tintin_reporter *tintin, char arg);
 void	create_deamon();
 void	setup_deamon(void);
 void	quit(void);
-int		main(void);
+char	*ft_decrypt(char *str);
 
 #endif
