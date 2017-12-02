@@ -47,6 +47,9 @@ bool	setup_deamon(t_connexion *connexion)
 		ptr->write_log("bind() failure", "\033[1;31mERROR\033[0m");
 		return (false);
 	}
+	//close(STDIN_FILENO);
+	//close(STDERR_FILENO);
+	//close(STDOUT_FILENO);
 	return (true);
 }
 

@@ -36,13 +36,14 @@ class	Tintin_reporter
 	void	create_lock_file(void);
 	void	create_log_file(void);
 	void	delete_lock_file(void) const;
+	void	send_mail();
 	~Tintin_reporter();
 
 	private:
 
-	int	m_fd_lock;
-	int	m_fd_log;
-
+	int			m_fd_lock;
+	int			m_fd_log;
+	std::string	m_file_name;
 };
 
 typedef struct			s_connexion

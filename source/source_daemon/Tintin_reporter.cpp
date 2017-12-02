@@ -55,8 +55,8 @@ void	Tintin_reporter::create_log_file(void)
 		exit (errno);
 	}
 	ss << "/var/log/matt_daemon/matt_daemon_" << now->tm_mday << "_" << now->tm_mon + 1 << "_" << now->tm_year + 1900 << "_" << now->tm_hour << "_" << now->tm_min << "_" << now->tm_sec << ".log";
-	std::string file_name = ss.str();
-	m_fd_log = open(file_name.c_str(), O_RDWR | O_CREAT | O_APPEND, 0755);
+	m_file_name = ss.str();
+	m_fd_log = open(m_file_name.c_str(), O_RDWR | O_CREAT | O_APPEND, 0755);
 	if (m_fd_log == -1)
 	{
 		perror("open");
@@ -88,6 +88,44 @@ void	Tintin_reporter::delete_lock_file(void) const
 	flock(m_fd_lock, LOCK_UN);
 	close(m_fd_lock);
 	remove("/var/lock/matt_daemon.lock");
+}
+
+void	Tintin_reporter::send_mail(void)
+{
+	CkMailMan	mailman;
+	CkEmail		email;
+
+	bool success = mailman.UnlockComponent("30-day trial");
+	if (success != true)
+	{
+		std::cout << mailman.lastErrorText() << "\r\n";
+		return;
+	}
+	mailman.put_SmtpHost("smtp.gmail.com");
+	mailman.put_SmtpUsername("ramzi90000@gmail.com");
+	mailman.put_SmtpPassword("izdxvufraise%901");
+	email.put_Subject("Log");
+	email.put_Body("");
+	email.put_From("Matt_daemon log");
+
+	email.addFileAttachment(m_file_name.c_str());
+	if (email.get_LastMethodSuccess() != true)
+	{
+		std::cout << email.lastErrorText() << "\r\n";
+		return;
+	}
+
+	success = email.AddTo("SegFault42", "SegFault42@protonmail.com");
+	success = mailman.SendEmail(email);
+	if (success != true)
+	{
+		std::cout << mailman.lastErrorText() << "\r\n";
+		return;
+	}
+	success = mailman.CloseSmtpConnection();
+	if (success != true)
+		std::cout << "Connection to SMTP server not closed cleanly." << "\r\n";
+	std::cout << "Mail Sent!" << "\r\n";
 }
 
 //Constructeur
