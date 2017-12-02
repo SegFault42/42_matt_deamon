@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <sstream>
+#include <CkMailMan.h>
+#include <CkEmail.h>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -51,7 +54,7 @@ typedef struct			s_connexion
 	int					client_socket[3];
 }						t_connexion;
 
-void	daemon(Tintin_reporter *tintin, char arg);
+bool	daemon(Tintin_reporter *tintin, char arg);
 void	create_deamon();
 void	setup_deamon(void);
 void	quit(void);
