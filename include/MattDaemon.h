@@ -25,12 +25,14 @@
 #include <sys/file.h>
 
 #define	MAX_CLIENT	3
+#define	BUFFSIZE	4096 * 4
 
 class	Tintin_reporter
 {
 	public:
 
 	Tintin_reporter();
+	Tintin_reporter(Tintin_reporter const & src);
 	void	write_log(std::string log, std::string type) const;
 	void	write_sig_error(int sig) const;
 	void	create_lock_file(void);
@@ -38,6 +40,7 @@ class	Tintin_reporter
 	void	delete_lock_file(void) const;
 	void	send_mail();
 	~Tintin_reporter();
+	Tintin_reporter & operator=(Tintin_reporter const & rhs);
 
 	private:
 
@@ -55,7 +58,7 @@ typedef struct			s_connexion
 	int					client_socket[3];
 }						t_connexion;
 
-bool	daemon(Tintin_reporter *tintin, char arg);
+bool	daemon(Tintin_reporter *tintin);
 void	create_deamon();
 void	setup_deamon(void);
 void	quit(void);

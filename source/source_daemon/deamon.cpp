@@ -16,7 +16,6 @@ bool	setup_deamon(t_connexion *connexion)
 	for (int i = 0; i < MAX_CLIENT; i++)
 		connexion->client_socket[i] = 0;
 
-	//create a master socket
 	if( (connexion->master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0)
 	{
 		perror("socket()");
@@ -24,8 +23,6 @@ bool	setup_deamon(t_connexion *connexion)
 		return (false); 
 	}
 
-	//set master socket to allow multiple connections , 
-	//this is just a good habit, it will work without this 
 	if ( setsockopt(connexion->master_socket, SOL_SOCKET, SO_REUSEADDR,
 		(char *)&connexion->opt, sizeof(connexion->opt)) < 0)
 	{
@@ -34,12 +31,10 @@ bool	setup_deamon(t_connexion *connexion)
 		return (false); 
 	}
 
-	//type of socket created 
 	connexion->address.sin_family = AF_INET;
 	connexion->address.sin_addr.s_addr = INADDR_ANY;
 	connexion->address.sin_port = htons(4242);
 
-	//bind the socket to localhost port 8888 
 	if (bind(connexion->master_socket, (struct sockaddr *)&connexion->address,
 		sizeof(connexion->address))<0)
 	{
@@ -47,9 +42,6 @@ bool	setup_deamon(t_connexion *connexion)
 		ptr->write_log("bind() failure", "\033[1;31mERROR\033[0m");
 		return (false);
 	}
-	//close(STDIN_FILENO);
-	//close(STDERR_FILENO);
-	//close(STDOUT_FILENO);
 	return (true);
 }
 
@@ -72,20 +64,23 @@ void	create_deamon(Tintin_reporter *tintin)
 	}
 	else if (ps_deamon > 0)
 	{
-		std::cout << "fork ok" << std::endl << "pid = " << ps_deamon << std::endl;
+		//std::cout << "fork ok" << std::endl << "pid = " << ps_deamon << std::endl;
 		exit(0);
 	}
 	tintin->write_log("Deamon created pid : " + std::to_string(getpid()), "\033[1;32mINFO\033[0m");
+	//close(STDIN_FILENO);
+	//close(STDERR_FILENO);
+	//close(STDOUT_FILENO);
 	for (int i = 1; i <= 64; ++i)
 		signal(i, signal_handler);
 }
 
-bool	daemon(Tintin_reporter *tintin, char arg)
+bool	daemon(Tintin_reporter *tintin)
 {
 	int			new_socket, activity, i , valread , sd;
 	int			max_sd;
 	int			nb_user = 0;
-	char		buffer[4097];  //data buffer of 1K 
+	char		buffer[BUFFSIZE + 1];
 	fd_set		readfds;
 	t_connexion	connexion;
 
@@ -117,8 +112,8 @@ bool	daemon(Tintin_reporter *tintin, char arg)
 				max_sd = sd;
 		}
 		activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
-		if ((activity < 0) && (errno!=EINTR))
-			printf("select error");
+		//if ((activity < 0) && (errno!=EINTR))
+			////printf("select error");
 
 		if (FD_ISSET(connexion.master_socket, &readfds))
 		{
@@ -153,7 +148,7 @@ bool	daemon(Tintin_reporter *tintin, char arg)
 			sd = connexion.client_socket[i];
 			if (FD_ISSET( sd , &readfds))
 			{
-				if ((valread = read( sd , buffer, 4096)) == 0)
+				if ((valread = recv( sd , buffer, BUFFSIZE, 0)) == 0)
 				{
 					getpeername(sd , (struct sockaddr*)&connexion.address , (socklen_t*)&connexion.addrlen);
 					tintin->write_log("User " + std::to_string(i + 1) + " request quit", "\033[1;35mLOG\033[0m");
@@ -177,6 +172,7 @@ bool	daemon(Tintin_reporter *tintin, char arg)
 							strcpy(buffer, ft_decrypt(&buffer[10]));
 						tintin->write_log(buffer, "\033[1;35mLOG\033[0m");
 					}
+					memset(&buffer, 0, BUFFSIZE);
 				}
 			}
 			for (int j = 0; j <= 2; j++)

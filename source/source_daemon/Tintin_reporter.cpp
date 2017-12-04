@@ -98,7 +98,7 @@ void	Tintin_reporter::send_mail(void)
 	bool success = mailman.UnlockComponent("30-day trial");
 	if (success != true)
 	{
-		std::cout << mailman.lastErrorText() << "\r\n";
+		//std::cout << mailman.lastErrorText() << "\r\n";
 		return;
 	}
 	mailman.put_SmtpHost("smtp.gmail.com");
@@ -111,7 +111,7 @@ void	Tintin_reporter::send_mail(void)
 	email.addFileAttachment(m_file_name.c_str());
 	if (email.get_LastMethodSuccess() != true)
 	{
-		std::cout << email.lastErrorText() << "\r\n";
+		//std::cout << email.lastErrorText() << "\r\n";
 		return;
 	}
 
@@ -119,13 +119,13 @@ void	Tintin_reporter::send_mail(void)
 	success = mailman.SendEmail(email);
 	if (success != true)
 	{
-		std::cout << mailman.lastErrorText() << "\r\n";
+		//std::cout << mailman.lastErrorText() << "\r\n";
 		return;
 	}
 	success = mailman.CloseSmtpConnection();
-	if (success != true)
-		std::cout << "Connection to SMTP server not closed cleanly." << "\r\n";
-	std::cout << "Mail Sent!" << "\r\n";
+	//if (success != true)
+		//std::cout << "Connection to SMTP server not closed cleanly." << "\r\n";
+	//std::cout << "Mail Sent!" << "\r\n";
 }
 
 //Constructeur

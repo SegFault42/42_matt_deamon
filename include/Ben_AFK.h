@@ -35,6 +35,7 @@
 # define GREY	"\033[38;5;246m"
 
 # define END	"\033[0m"
+# define BUFFSIZE	4096 * 4
 #define OLD term[0]
 #define NEW term[1]
 

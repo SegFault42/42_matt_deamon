@@ -35,10 +35,6 @@ static void	get_arg(int argc, char **argv, char *arg)
 	{
 		if (argv[i][0] == '-' && argv[i][1] == 'm' && strlen(argv[i]) == 2)
 			*arg |= 1;
-		//if (argv[i][0] == '-' && argv[i][1] == 'd' && strlen(argv[i]) == 2)
-		//*arg |= 2;
-		//if (argv[i][0] == '-' && argv[i][1] == 'e' && strlen(argv[i]) == 2)
-		//*arg |= 4;
 	}
 }
 
@@ -53,6 +49,7 @@ int	main(int argc, char **argv)
 	get_arg(argc -1, &argv[1], &arg);
 	ptr = &tintin;
 
-	if (daemon(&tintin, arg) == true && arg == 1)
+	if (daemon(&tintin) == true && arg == 1)
 		tintin.send_mail();;
+	(void)argc;
 }

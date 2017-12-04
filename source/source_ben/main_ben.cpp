@@ -98,18 +98,18 @@ static uint8_t	authentification(void)
 	return (0);
 }
 
-int	main(int argc, char **argv)
+int	main()
 {
-	int	sock;
-	char	buff[4096] = {0};
+	int			sock;
+	char		buff[BUFFSIZE] = {0};
 	ssize_t		ret_read = 0;
 
-	sock = create_client("localhost", 4242);
+	sock = create_client((char *)"localhost", 4242);
 	g_auth = authentification();
 
 	while (1)
 	{
-		if ((ret_read = read(0, buff, 4096)) == -1)
+		if ((ret_read = read(0, buff, BUFFSIZE)) == -1)
 		{
 			perror("read");
 			return (errno);
@@ -121,16 +121,14 @@ int	main(int argc, char **argv)
 			strcpy(&buff[strlen("0xrabougue")], buff);
 			memcpy(buff, "0xrabougue", 10);
 		}
-		if (send(sock, buff, 4096, 0) == -1)
+		if (send(sock, buff, BUFFSIZE, 0) == -1)
 		{
 			perror("send");
 			return (errno);
 		}
-		if (!strcmp(buff, "quit") || !strlen(buff))
+		if (!strcmp(buff, "quit"))
 			return (0);
-		memset(buff, 0, 4096);
+		memset(&buff, 0, BUFFSIZE);
 	}
 
-	if (argv[1])
-		std::cout << ft_crypt(argv[1]) << std::endl;
 }
