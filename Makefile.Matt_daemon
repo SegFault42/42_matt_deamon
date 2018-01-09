@@ -3,7 +3,7 @@ NAME	= Matt_daemon
 
 CC		= clang++
 
-FLAG	= -std=c++11 -Wall -Wextra #-Werror
+FLAG	= -std=c++11 -Wall -Wextra -Werror
 
 SRCS	=	./source/source_daemon/main.cpp\
 			./source/source_daemon/deamon.cpp\
@@ -15,6 +15,8 @@ OBJS	=	./main.o\
 
 INCLUDE	= -I ./include -I ./chilkat-9.5.0-x86_64-linux-gcc/include/
 
+LIB_CHILKAT = -lchilkat-9.5.0 -lresolv -lpthread
+
 ###########################_RELINK_MODIFY_.h####################################
 RELINK = ./include/MattDaemon.h
 ################################################################################
@@ -23,12 +25,14 @@ all: $(NAME)
 
 $(NAME): 
 	@$(CC) $(FLAG) $(SRCS) -c $(INCLUDE)
-	@$(CC) $(FLAG) $(OBJS) -o $(NAME) -L./chilkat-9.5.0-x86_64-linux-gcc/lib -lchilkat-9.5.0 -lresolv -lpthread -I ./chilkat-9.5.0-x86_64-linux-gcc/include/
+	@$(CC) $(FLAG) $(OBJS) -o $(NAME) $(LIB_CHILKAT)
 
 clean:
 	@printf "                                                               \r"
 	@printf "✅  clean done !\n"
 	@rm -f $(OBJS)
+
+fclean: clean
 	@rm -f $(NAME)
 
 re: clean all

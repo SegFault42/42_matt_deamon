@@ -7,6 +7,7 @@
 #include <sstream>
 #include <CkMailMan.h>
 #include <CkEmail.h>
+#include "/include/CkMailMan.h"
 
 #include <netdb.h>
 #include <netinet/in.h>

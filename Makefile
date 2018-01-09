@@ -14,8 +14,8 @@ BLUE = \033[34m
 WHITE = \033[37m
 
 all:
-	@make -sf ./Makefile.Matt_daemon
 	@make -sf ./Makefile.Ben_AFK
+	@make -sf ./Makefile.Matt_daemon
 	@printf "$(WHITE)┌────────────────────────────────────────────────────────────────────┐\n\
 	│$(BLUE)ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss$(WHITE)│\n\
 	│$(BLUE)ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss$(WHITE)│\n\
@@ -50,11 +50,11 @@ all:
 	│$(BLUE)ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss$(WHITE)│\n\
 	└────────────────────────────────────────────────────────────────────┘\n"
 
-Matt_daemon:
-	@make -sf ./Makefile.Matt_daemon
-
 Ben_AFK:
-	@make -sf Makefile.Ben_AFK
+	@make -sf ./Makefile.Ben_AFK
+
+Matt_daemon:
+	@make -sf Makefile.Matt_daemon
 
 clean:
 	@make clean -sf ./Makefile.Matt_daemon

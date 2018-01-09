@@ -3,3 +3,7 @@ mail
 client
 archivage des logs
 authentification
+
+tcpdump :
+sudo tcpdump -i lo port 4242 -w ./test.dump
+sudo tcpdump -r test.dump
