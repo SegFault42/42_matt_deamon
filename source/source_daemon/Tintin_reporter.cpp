@@ -103,7 +103,7 @@ void	Tintin_reporter::send_mail(void)
 	}
 	mailman.put_SmtpHost("smtp.gmail.com");
 	mailman.put_SmtpUsername("ramzi90000@gmail.com");
-	mailman.put_SmtpPassword("izdxvufraise%901");
+	mailman.put_SmtpPassword("password here");
 	email.put_Subject("Log");
 	email.put_Body("");
 	email.put_From("Matt_daemon log");
